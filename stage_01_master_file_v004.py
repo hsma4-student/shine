@@ -1405,19 +1405,23 @@ run = paraObj2.add_run("The tool in its current form allows the user to either r
 run = paraObj2.add_run("For number fields (such as age) the current approach involves replace the missing data with the median (middle) value of that data field.")
 '''
 
-doc.add_paragraph("The chart below displays the sample size used and expected predictive accuracy associated with this sample size (along with other possible sample sizes). The red cross highlights the sample size used for the model and the anticipated 'out of the box' accuracy that may be expected with the initial base logistic regression model for that sample size. It is worth noting accuracy will increase with increased sample size, and the choice to use a sample size less than the total is usually due to limitations such as insufficient computer power to run the model (though this is not an anticipated issue for the model created). ")
-file_path = f'{dna_assets_path}\\chart001_FigSelectedSampleSizeAccuracy.png'
-doc.add_picture(file_path, width=docx.shared.Cm(10), height=docx.shared.Cm(6))
+if user_decision == 'y':
+    doc.add_paragraph("The chart below displays the sample size used and expected predictive accuracy associated with this sample size (along with other possible sample sizes). The red cross highlights the sample size used for the model and the anticipated 'out of the box' accuracy that may be expected with the initial base logistic regression model for that sample size. It is worth noting accuracy will increase with increased sample size, and the choice to use a sample size less than the total is usually due to limitations such as insufficient computer power to run the model (though this is not an anticipated issue for the model created). ")
+    file_path = f'{dna_assets_path}\\chart001_FigSelectedSampleSizeAccuracy.png'
+    doc.add_picture(file_path, width=docx.shared.Cm(10), height=docx.shared.Cm(6))
 
-doc.add_paragraph(f"The model used for this component was a logistic regresssion. 9 variants of this logistic regression were run with the best performing being {optimal_model_name_final} with a ROC Area Under the Curve value of {roc_auc_optimal_model} and {classification_strength}.")
-doc.add_paragraph("The performance metrics for this top performing variant are summarised in the table below and the metrics for all models (including the other 8 alternative variants) are in Appendix 3.")
+    doc.add_paragraph(f"The model used for this component was a logistic regresssion. 9 variants of this logistic regression were run with the best performing being {optimal_model_name_final} with a ROC Area Under the Curve value of {roc_auc_optimal_model} and {classification_strength}.")
+    doc.add_paragraph("The performance metrics for this top performing variant are summarised in the table below and the metrics for all models (including the other 8 alternative variants) are in Appendix 3.")
 
-#For loop to add the tables to the doc outlining the top 5 features associated with higher or lower DNA chance, respectively.
-for direction in ['Higher', 'Lower']:
-    doc.add_heading(f'Features associated with a {direction.lower()} chance of non-attendance:', 3)
-    #para = doc.add_paragraph()
-    add_df_as_table(preferred_font_name, doc, dict_dna_higher_lower_chance[direction], chosen_style)
-    run = para.add_run()
+    #For loop to add the tables to the doc outlining the top 5 features associated with higher or lower DNA chance, respectively.
+    for direction in ['Higher', 'Lower']:
+        doc.add_heading(f'Features associated with a {direction.lower()} chance of non-attendance:', 3)
+        #para = doc.add_paragraph()
+        add_df_as_table(preferred_font_name, doc, dict_dna_higher_lower_chance[direction], chosen_style)
+        run = para.add_run()
+
+else:
+    doc.add_paragraph("There are no outputs to report in this section as the machine learning models were not run on the dataset.")
 
 #-----------------------------------------------------------
 

@@ -568,8 +568,18 @@ def remove_inappropriate_appt_statuses(df, df_field, field_name):
     
     unique_options_attend_status = [item for item in ls if type(item) != float]
     
+    dict_of_unique_options = {}
+    appt_status_to_drop = []
+    appt_status_to_keep = []
+
     if len(unique_options_attend_status) == 2:
         print(f"{df_field} is a binary measure - perfect!")
+        
+        unique_key_counter = 1
+        for option in unique_options_attend_status:
+            dict_of_unique_options[unique_key_counter] = option
+            unique_key_counter += 1
+
     elif len(unique_options_attend_status) > 2:
         print(f"\n{df_field} has too many possible appointment statuses.")
         print("\nThe unique appointment statuses are listed below.")
@@ -577,14 +587,14 @@ def remove_inappropriate_appt_statuses(df, df_field, field_name):
         print("This will remove rows for those appointments from the data set to be used in the analysis.")
         print("Once the list only includes 2 appointment statuses, enter 0 to continue.")
               
-        dict_of_unique_options = {}
+        #dict_of_unique_options = {}
         unique_key_counter = 1
         for option in unique_options_attend_status:
             dict_of_unique_options[unique_key_counter] = option
             unique_key_counter += 1    
 
-        appt_status_to_drop = []
-        appt_status_to_keep = []
+        #appt_status_to_drop = []
+        #appt_status_to_keep = []
         
         appt_status_to_drop.append("nan")
         
@@ -1323,6 +1333,31 @@ count_row_before = obj_1a_df.shape[0]
 #Create DataFrame for Objective 1A (HEA / profile):
 #keep="last" as df has already been sorted ascending in earlier code 
 #Assumption is because specific demographics can change, the latest known contact should be the most accurate to use, hence retain the latest attendance only
+#obj_1a_df = obj_1a_df.sort_values(appt_date_time, ascending=True) #22/6
+
+# --------------------------------------------------------
+# new code block to fix error in above sort added 23/6
+#list old dates to check for validation
+list_old_dates = list(obj_1a_df.appt_date_time)
+
+#convert to date time and populate a list
+list_new_dates = [pd.to_datetime(row.appt_date_time, format="%d/%m/%Y %H:%M") for row in obj_1a_df.itertuples()]
+
+#add list of datetime objects as new column / series to dataframe
+obj_1a_df.insert(6, 'DateEvent_datetime', list_new_dates)
+
+#delete the original date time field 
+obj_1a_df = obj_1a_df.drop(appt_date_time, axis=1)
+
+#rename new date time field to the same name as the old one that was just dropped
+obj_1a_df.rename(columns={'DateEvent_datetime': appt_date_time}, inplace=True)
+
+#sort the df based on the date time in ascending order
+obj_1a_df = obj_1a_df.sort_values(appt_date_time, ascending=True) #current line 1336
+
+#filter to in-area only
+obj_1a_df = obj_1a_df[obj_1a_df[in_out_area_classifier] == 'in-area']
+# --------------------------------------------------------
 
 obj_1a_df_unique_pts = obj_1a_df.drop_duplicates(subset=patient_id.lower(), keep="last") 
 count_row_after = obj_1a_df_unique_pts.shape[0]
@@ -1341,9 +1376,9 @@ obj_2_data_fields = list(obj_2_df.columns)
 
 # ---------------------------------------
 
-#new code 19/09 remove out of area patients from this objectives' data frame
-mask = obj_1a_df_unique_pts[in_out_area_classifier] == 'in-area' #in-area required in real data set
-obj_1a_df_unique_pts = obj_1a_df_unique_pts[mask]
+#new code 19/09 remove out of area patients from this objectives' data frame - now being handled in above new code block
+#mask = obj_1a_df_unique_pts[in_out_area_classifier] == 'in-area' #in-area required in real data set
+#obj_1a_df_unique_pts = obj_1a_df_unique_pts[mask]
 
 # ---------------------------------------
 
@@ -2146,6 +2181,11 @@ emissions_for_report_str_fields_keep = str_fields_keep
 emissions_for_report_str_fields_drop = str_fields_drop
 emissions_for_report_datetime_fields_keep = datetime_fields_keep
 emissions_for_report_datetime_fields_drop  = datetime_fields_drop
+
+#-----------------------------------------------------
+#13/6/23 revision - to control for when the source data has Nulls in the clinic_name field
+if clinic_name in emissions_for_report_str_fields_keep:
+    clinic_name = f"{clinic_name}_with_missing"
 
 #-----------------------------------------------------
 #Global dicts for use when impute_missing function is called

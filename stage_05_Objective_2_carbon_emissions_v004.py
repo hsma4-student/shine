@@ -636,6 +636,20 @@ patient_matrix = pd.read_csv(r"Assets_produced_by_code//04_Carbon_emissions_asse
 distance_matrix =  pd.read_csv(r"Assets_produced_by_code//04_Carbon_emissions_assets//df001_DistanceMatrix.csv").fillna(0)
 #distance_matrix =  matrix_to_df_copy
 
+#16/6/23 - code to ensure patient matrix definitely matches structure of distance matrix. 
+#it is possible, once processed, the processed data for this section doesnt include all clinics 
+#in which case the patient matrix will have fewer columns than (and not match) the distance matrix
+#this will cause an error. The below code updates the patient matrix with any missing clinics and assigns zero values
+patient_matrix_columns = patient_matrix.columns
+distance_matrix_columns = distance_matrix.columns
+
+missing_columns = set(distance_matrix_columns) - set(patient_matrix_columns)
+
+for col in missing_columns:
+    patient_matrix[col] = 0
+
+patient_matrix = patient_matrix.reindex(columns=distance_matrix_columns)
+
 #get lsoas from each matrix into respective lists
 patient_lsoa = patient_matrix['lsoa_residence'].tolist()
 distance_lsoa = distance_matrix['lsoa_residence'].tolist() #was all_lsoa

@@ -164,7 +164,7 @@ num_dims = 5
 #sample_size_increment = 250 #original hard coded approach, replaced by user_parameter below
 sample_size_increment = pd.read_excel(filename, 'DNA_ML_parameters', index_col=None, usecols = "C", header = 2, nrows=0)
 sample_size_increment = list(sample_size_increment)[0]
-
+print(sample_size_increment)
 """
 #Code to create a new sub-directory within the current working directory, to store model outputs
 directory_name = "Assets"
@@ -177,6 +177,8 @@ except FileExistsError:
     print(f"A directory called '{directory_name}' already exists.")
     """
 
+#16/6/23 variable to make adjusting max iterations easier
+max_iterations = 1000
 
 #subdirectory folder names for assets folder
 preprocessing_assets_path = 'Assets_produced_by_code/01_pre_processing_assets'
@@ -1335,7 +1337,7 @@ def add_polynomial_features_original(
             # Standardise X data
             X_train_std, X_test_std = standardise_data(X_train, X_test)
             # Fit model with regularisation (C)
-            model = LogisticRegression(C=reg, solver='lbfgs', max_iter=1000)
+            model = LogisticRegression(C=reg, solver='lbfgs', max_iter=max_iterations)
             model.fit(X_train_std,y_train)
             # Predict training and test set labels
             y_pred_train = model.predict(X_train_std)
@@ -1381,7 +1383,7 @@ def add_polynomial_features_original(
             # Standardise X data
             X_train_std, X_test_std = standardise_data(X_train, X_test)
             # Fit model with regularisation (C)
-            model = LogisticRegression(C=reg, solver='lbfgs', max_iter=1000)
+            model = LogisticRegression(C=reg, solver='lbfgs', max_iter=max_iterations)
             model.fit(X_train_std,y_train)
             # Predict training and test set labels
             y_pred_train = model.predict(X_train_std)
@@ -3263,7 +3265,7 @@ def add_polynomial_features(
             X_train_std, X_test_std = standardise_data(X_train, X_test)
             
             # Fit model with regularisation (C)
-            model = LogisticRegression(C=reg, solver='lbfgs', max_iter=1000)
+            model = LogisticRegression(C=reg, solver='lbfgs', max_iter=max_iterations)
             model.fit(X_train_std,y_train)
             
             #get coefficients for this fold
@@ -3329,7 +3331,7 @@ def add_polynomial_features(
             X_train_std, X_test_std = standardise_data(X_train, X_test)
             
             # Fit model with regularisation (C)
-            model = LogisticRegression(C=reg, solver='lbfgs', max_iter=1000)
+            model = LogisticRegression(C=reg, solver='lbfgs', max_iter=max_iterations)
             model.fit(X_train_std,y_train)
 
             #get coefficients for this fold - poly
@@ -3736,6 +3738,9 @@ results_accuracy, results_training_size= get_values_for_learning_curve_log_reg(
         rand_state,
         sample_size_increment)
 
+#test line to view the possible training set sizes
+print(results_training_size)
+
 #Plot the learning curve using the plot_learning_curve function
 plot_learning_curve(results_training_size, results_accuracy)
 
@@ -3759,7 +3764,8 @@ if use_all_data == "n":
     y_np = y.values
 
 else:
-    sample_size = max_training_size
+    #sample_size = max_training_size #errors with ValueError on occasion, where the max training size is not in the list of possible sizes
+    sample_size = results_training_size[-1] #this approach works and is the largest sample size rounded to the user_parameter increment chosen 
 
 #call function to display another version of the learning curve
 #this time, displaying the selected sample size on the curve with a bold red X

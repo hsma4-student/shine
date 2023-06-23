@@ -139,6 +139,7 @@ def calc_diff_between_proportions(list_prop_1, list_prop_2):
     array_prop_1 = np.array(list_prop_1)
     array_prop_2 = np.array(list_prop_2)
     diff_between_props = (array_prop_1 - array_prop_2).tolist()
+    
     return(diff_between_props)
 
 # -----------------------------------
@@ -420,6 +421,12 @@ def create_condition_to_param_dict(df, desired_col_list, value_column_string, nu
     #convert to a dictionary
     temp_dict = subset_df.to_dict()
 
+    #15/6/23 code to control for conditions with age 90+ zxcv
+    print(temp_dict)
+    for key in temp_dict.keys():
+        print(type(key))
+
+
     #populate a dict to subsequent populate with condition (key) to prev rate multiplier (values)
     dict_condition_to_col_of_interest = {}
 
@@ -496,7 +503,7 @@ def run_chi_square_test(
         #to be at least 5 is met. Where this condition is met, a Bool of True is present, otherwise, False is present.
         dict_chi_square_conditions_met = {}
         for key in dict_expected_service_counts_per_condition_6.keys():
-            dict_chi_square_conditions_met[key] = dict_expected_service_counts_per_condition_6['GUM'].min() >= 5 and dict_condition_category_service_counts_2[key].min() >= 5
+            dict_chi_square_conditions_met[key] = dict_expected_service_counts_per_condition_6[key].min() >= 5 and dict_condition_category_service_counts_2[key].min() >= 5
 
     return(dict_chi_square_test_results_per_condition, dict_chi_square_test_statistic_per_condition, dict_chi_square_test_pvalue_per_condition, dict_chi_square_test_sig_at_alpha_per_condition)
 
@@ -605,6 +612,16 @@ prev_multiplier_col_name = revised_column_names_from_condition_df[9]
 #create list_of_conditions variable
 list_of_conditions = df_condition_params_original[condition_col_name].tolist()
 
+#zxcv
+#15/6/23 revising max_age values wherever these are == 90 to instead be 90+
+#this is because this is the value in the associated cell in the ONS population estimate data tables
+"""print(df_condition_params_original)
+print()
+df_condition_params_original['max_age'] = df_condition_params_original['max_age'].replace([90], '90+')
+print(df_condition_params_original)
+print()"""
+
+
 #create dictionary of condition to prevalence rate type
 dict_condition_to_prevalence_rate = create_condition_to_param_dict(df_condition_params_original, [0, 1], prev_type_col_name, number_of_conditions_modelling_for, str)
 
@@ -628,6 +645,13 @@ dict_min_age_for_each_condition = create_condition_to_param_dict(df_condition_pa
 
 #create dictionary of condition name to max age
 dict_max_age_for_each_condition = create_condition_to_param_dict(df_condition_params_original, [0, 5], max_age_col_name, number_of_conditions_modelling_for, str)
+
+#zxcv #15/6
+print()
+print(dict_max_age_for_each_condition)
+print()
+print(dict_min_age_for_each_condition)
+print()
 
 #create dictionary of condition name to gender seen
 dict_pop_gender_for_each_condition_text = create_condition_to_param_dict(df_condition_params_original, [0, 6], gender_col_name, number_of_conditions_modelling_for, str)
@@ -785,11 +809,11 @@ for condition in list_of_conditions:
 
     #using list comprehension, derive the start ages for each age range relevant to the user-entered parameters
     condition_start_ages = [list_start_ages.append(min_age + age) for age in range(0, service_age_range, bin_range)]
-    dict_condition_start_ages[condition] = list_start_ages
+    dict_condition_start_ages[condition] = list_start_ages[:num_bins+1]
 
     #using list comprehension, derive the end ages for each age range relevant to the user-entered parameters
     condition_end_ages = [list_end_ages.append(min_age + age + (bin_range-1)) for age in range(0, service_age_range, bin_range)]
-    dict_condition_end_ages[condition] = list_end_ages
+    dict_condition_end_ages[condition] = list_end_ages[:num_bins+1]
 
     #print(f"{condition} : {dict_condition_end_ages}") # test print - delete
 
@@ -1566,14 +1590,18 @@ for condition in list_of_conditions:
         #These are taken from: https://www.ethnicity-facts-figures.service.gov.uk/style-guide/ethnic-groups#:~:text=The%20ethnic%20groups%20will%20be%3A%20Asian%2C%20Scottish%20Asian,British%20Pakistani%20Indian%2C%20Scottish%20Indian%20or%20British%20Indian
 
         dict_condition_dataset_mapped_ethnicity = {k:v for k, v in dict_condition_dataset.items()}
-
+                
         #dict_condition_dataset_mapped_ethnicity = {}
 
         #for each loop through of conditions present, loop through the ethnicities present in the df and replace these with the high level groups from the user parameters file
         for ethnicity in list_ethnicities_present_in_service_data:
-            dict_condition_dataset_mapped_ethnicity[condition][ethnicity_field_name] = dict_condition_dataset_mapped_ethnicity[condition][ethnicity_field_name].str.replace(ethnicity, dict_service_ethnic_groups_to_high_level[ethnicity])
+            #original 
+            #dict_condition_dataset_mapped_ethnicity[condition][ethnicity_field_name] = dict_condition_dataset_mapped_ethnicity[condition][ethnicity_field_name].str.replace(ethnicity, dict_service_ethnic_groups_to_high_level[ethnicity])
+            
+            #revised line 15/6 to ensure mapping of ethnicity works correctly
+            dict_condition_dataset_mapped_ethnicity[condition][ethnicity_field_name] = dict_condition_dataset_mapped_ethnicity[condition][ethnicity_field_name].str.replace(f"^{ethnicity}$", dict_service_ethnic_groups_to_high_level[ethnicity], regex=True)
 
-        dict_condition_dataset_mapped_ethnicity[condition]
+        #dict_condition_dataset_mapped_ethnicity[condition]
 
         #filtering index where ethnicity_with_missing == 'missing'
         indexes = dict_condition_dataset_mapped_ethnicity[condition][dict_condition_dataset_mapped_ethnicity[condition][ethnicity_field_name] == 'missing'].index
@@ -1597,7 +1625,12 @@ for condition in list_of_conditions:
     #loop through conditions present, then for each condition, loop through the ethnicities present in the df and replace these with the high level groups from the user parameters file
     #for condition in list_of_conditions:
         for ethnicity in list_ethnicities_present_in_service_data:
-            dict_condition_dataset_all_ages_in_range_mapped_gender_ethnicity_subset[condition][ethnicity_field_name] = dict_condition_dataset_all_ages_in_range_mapped_gender_ethnicity_subset[condition][ethnicity_field_name].str.replace(ethnicity, dict_service_ethnic_groups_to_high_level[ethnicity])
+            #original but mapping ethnicities applied incorrectly with test data set 
+            #dict_condition_dataset_all_ages_in_range_mapped_gender_ethnicity_subset[condition][ethnicity_field_name] = dict_condition_dataset_all_ages_in_range_mapped_gender_ethnicity_subset[condition][ethnicity_field_name].str.replace(ethnicity, dict_service_ethnic_groups_to_high_level[ethnicity])
+
+            #revised line 15/6 to ensure mapping of ethnicity works correctly
+            dict_condition_dataset_all_ages_in_range_mapped_gender_ethnicity_subset[condition][ethnicity_field_name] = dict_condition_dataset_all_ages_in_range_mapped_gender_ethnicity_subset[condition][ethnicity_field_name].str.replace(f"^{ethnicity}$", dict_service_ethnic_groups_to_high_level[ethnicity], regex=True)
+
 
         #dict_condition_dataset_all_ages_in_range_mapped_gender_ethnicity_subset[condition]
 
@@ -1632,6 +1665,10 @@ for condition in list_of_conditions:
     else:
         dict_condition_ethnicity_df_to_use[condition] = dict_condition_dataset_all_ages_in_range_mapped_gender_ethnicity_subset[condition]
 
+#save dfs to check content / structure to debug ethnicity key error 
+for key in dict_condition_ethnicity_df_to_use.keys():
+    dict_condition_ethnicity_df_to_use[key].to_csv(f'df_debug_{key}.csv')
+
 # ---------------------------------------------
 
 #now we want to create the counts of patients with each ethnicity and assign these to a dictionary using condition name as the constant key
@@ -1639,7 +1676,24 @@ dict_service_counts_condition_ethnicity = {}
 
 for condition in list_of_conditions:
     count_by_ethnic_group = dict_condition_ethnicity_df_to_use[condition].value_counts(subset=[ethnicity_field_name]).sort_index(ascending=True)
-    dict_service_counts_condition_ethnicity[condition] = count_by_ethnic_group
+    
+    #test print to check dtype
+    print()
+    print(condition)
+    print(count_by_ethnic_group)
+    print()
+
+    #15/6/23 code to check whether all ethnicity labels are present in the source data
+    #if not, add the missing ethnicity category, with a value of 0, then sort so all in consistent order
+    for k in ['Asian', 'Black', 'Mixed', 'White', 'Other']:
+        if k not in count_by_ethnic_group.keys():
+            count_by_ethnic_group[k] = 0 
+        else: 
+            count_by_ethnic_group[k] = count_by_ethnic_group[k]
+
+    sorted_series_count_ethnicities = pd.Series(dict(sorted(count_by_ethnic_group.items())))
+
+    dict_service_counts_condition_ethnicity[condition] = sorted_series_count_ethnicities
 
 # ----------------------------------------------
 
@@ -1716,12 +1770,23 @@ dict_condition_ethnicity_population_percents = {}
 #loop through each condition present and convert the counts to percents using the function created earlier
 for condition in list_of_conditions:
     #first convert service data to percents and add as a list of float values to the relevant dictionary above
+
     service_ethnicity_percents = calc_list_percents_for_list_ints(list(dict_service_counts_condition_ethnicity[condition]))
     dict_condition_ethnicity_service_percents[condition] = service_ethnicity_percents
 
     #Then, convert population data to percents and add as a list of float values to the relevant dictionary above
     pop_ethnicity_percents = calc_list_percents_for_list_ints(list(dict_condition_ethnicity_sub_totals[condition]))
     dict_condition_ethnicity_population_percents[condition] = pop_ethnicity_percents
+
+#15/6/23 test print - service percents correct at this point.
+
+print()
+print("service percents:")
+print(dict_condition_ethnicity_service_percents)
+print()
+print("pop percents:")
+print(dict_condition_ethnicity_population_percents)
+print()
 
 # --------------------------------------------------------
 
@@ -1733,7 +1798,7 @@ for condition in list_of_conditions:
     dict_condition_diff_percents_ethnicity[condition] = diff_between_pop_and_service_list
 
 #test print - delete in final
-dict_condition_diff_percents_ethnicity
+print(dict_condition_diff_percents_ethnicity)
 
 # -----------------------------------------------------
  
@@ -1757,7 +1822,8 @@ for condition in list_of_conditions:
     for num in range(num_bins_ethnicity):
         temp_list = []
         temp_list.append(ethnicity_col_names[num])
-        temp_list.append(service_ethnicity_percents[num])
+        #temp_list.append(service_ethnicity_percents[num]) #original, replaced with line below
+        temp_list.append(dict_condition_ethnicity_service_percents[condition][num]) #test alternative 15/6 - works as expected.
         temp_list.append(dict_condition_95_confidence_interval_ethnicity[condition][num])
         temp_list.append(dict_condition_ethnicity_population_percents[condition][num])
         temp_list.append(dict_condition_95_confidence_interval_sig_bool_ethnicity[condition][num])
