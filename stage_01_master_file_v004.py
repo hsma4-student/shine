@@ -29,7 +29,7 @@ print("Program has started. Pre-Processing code now running.")
 print()
 print("-----------------------------------------------------------------------------")
 
-import stage_02_Objective_0_PreProcessing_003
+import stage_02_Objective_0_PreProcessing_004
 processing_run_time = round(((time.time() - processing_time_start)/60),2)
 
 print("-----------------------------------------------------------------------------")
@@ -46,7 +46,7 @@ if user_decision == 'y':
     ML_model_run = True
     print("Now starting to run DNA ML model")
     ml_time_start = time.time()
-    import stage_03_Objective_1a_ML_v003
+    import stage_03_Objective_1a_ML_v004
     ml_run_time = round(((time.time() - ml_time_start)/60), 2)
 
     print("----------------------------------------------------------")
@@ -73,7 +73,7 @@ print()
 print("--------------------------------------------------------------")
 
 carbon_time_start = time.time()
-import stage_05_Objective_2_carbon_emissions_v003
+import stage_05_Objective_2_carbon_emissions_v005
 carbon_run_time = round(((time.time() - carbon_time_start)/60),2)
 
 print("------------------------------------------------------------")
@@ -1484,7 +1484,7 @@ add_appendix(doc, "Summary of methods used", 1, 'This appendix includes a summar
 
 doc.add_heading("Summary of fields used in each stage", 2)
 doc.add_paragraph("The pre-processing stage of the tool 'chunks up' the raw data into 3 separate data sets to start with, 1 for each stage of the program, before each is subsequently further processed to get to a processed data file for each stage. The table below summarises the fields in scope at the initial stage for each component.\n")
-add_df_as_table(preferred_font_name, doc, stage_02_Objective_0_PreProcessing_003.df_summary_of_fields_used_in_each_section, chosen_style)
+add_df_as_table(preferred_font_name, doc, stage_02_Objective_0_PreProcessing_004.df_summary_of_fields_used_in_each_section, chosen_style)
 
 para = doc.add_paragraph("\nBroadly speaking, each final processed data file created:\n")
 run = para.add_run("1. Includes fields that originally had no missing data;\n")
@@ -1505,15 +1505,15 @@ run = para.add_run("3. 'In area' attendances only. This is because the HEA compa
 #list imputed fields
 doc.add_heading("Approach to handling missing data:", 5)
 doc.add_heading("Fields imputed (missing data replaced):", 5)
-para = add_list_fields_kept_or_dropped_to_pydoc(doc, stage_02_Objective_0_PreProcessing_003.hea_for_report_int_float_fields_keep, 'int', 'included')
-para = add_list_fields_kept_or_dropped_to_pydoc(doc, stage_02_Objective_0_PreProcessing_003.hea_for_report_str_fields_keep, 'str', 'included')
-para = add_list_fields_kept_or_dropped_to_pydoc(doc, stage_02_Objective_0_PreProcessing_003.hea_for_report_datetime_fields_keep, 'date', 'included')
+para = add_list_fields_kept_or_dropped_to_pydoc(doc, stage_02_Objective_0_PreProcessing_004.hea_for_report_int_float_fields_keep, 'int', 'included')
+para = add_list_fields_kept_or_dropped_to_pydoc(doc, stage_02_Objective_0_PreProcessing_004.hea_for_report_str_fields_keep, 'str', 'included')
+para = add_list_fields_kept_or_dropped_to_pydoc(doc, stage_02_Objective_0_PreProcessing_004.hea_for_report_datetime_fields_keep, 'date', 'included')
 
 #list dropped fields with missing data
 doc.add_heading("Fields with missing data that were removed from the analysis:", 4)
-para = add_list_fields_kept_or_dropped_to_pydoc(doc, stage_02_Objective_0_PreProcessing_003.hea_for_report_int_float_fields_drop, 'int', 'excluded')
-para = add_list_fields_kept_or_dropped_to_pydoc(doc, stage_02_Objective_0_PreProcessing_003.hea_for_report_str_fields_drop, 'str', 'excluded')
-para = add_list_fields_kept_or_dropped_to_pydoc(doc, stage_02_Objective_0_PreProcessing_003.hea_for_report_datetime_fields_drop, 'date', 'excluded')
+para = add_list_fields_kept_or_dropped_to_pydoc(doc, stage_02_Objective_0_PreProcessing_004.hea_for_report_int_float_fields_drop, 'int', 'excluded')
+para = add_list_fields_kept_or_dropped_to_pydoc(doc, stage_02_Objective_0_PreProcessing_004.hea_for_report_str_fields_drop, 'str', 'excluded')
+para = add_list_fields_kept_or_dropped_to_pydoc(doc, stage_02_Objective_0_PreProcessing_004.hea_for_report_datetime_fields_drop, 'date', 'excluded')
 
 #sub-heading DNA ML section
 doc.add_heading('02. DNA', 3)
@@ -1531,15 +1531,15 @@ run = para.add_run("6. 'Attendance statuses reflective of a DNA or Attended appo
 #list imputed fields
 doc.add_heading("Approach to handling missing data:", 5)
 doc.add_heading("Fields imputed (missing data replaced):", 5)
-para = add_list_fields_kept_or_dropped_to_pydoc(doc, stage_02_Objective_0_PreProcessing_003.dna_for_report_int_float_fields_keep, 'int', 'included')
-para = add_list_fields_kept_or_dropped_to_pydoc(doc, stage_02_Objective_0_PreProcessing_003.dna_for_report_str_fields_keep, 'str', 'included')
-para = add_list_fields_kept_or_dropped_to_pydoc(doc, stage_02_Objective_0_PreProcessing_003.dna_for_report_datetime_fields_keep, 'date', 'included')
+para = add_list_fields_kept_or_dropped_to_pydoc(doc, stage_02_Objective_0_PreProcessing_004.dna_for_report_int_float_fields_keep, 'int', 'included')
+para = add_list_fields_kept_or_dropped_to_pydoc(doc, stage_02_Objective_0_PreProcessing_004.dna_for_report_str_fields_keep, 'str', 'included')
+para = add_list_fields_kept_or_dropped_to_pydoc(doc, stage_02_Objective_0_PreProcessing_004.dna_for_report_datetime_fields_keep, 'date', 'included')
 
 #list dropped fields with missing data
 doc.add_heading("Fields with missing data that were removed from the analysis:", 4)
-para = add_list_fields_kept_or_dropped_to_pydoc(doc, stage_02_Objective_0_PreProcessing_003.dna_for_report_int_float_fields_drop, 'int', 'excluded')
-para = add_list_fields_kept_or_dropped_to_pydoc(doc, stage_02_Objective_0_PreProcessing_003.dna_for_report_str_fields_drop, 'str', 'excluded')
-para = add_list_fields_kept_or_dropped_to_pydoc(doc, stage_02_Objective_0_PreProcessing_003.dna_for_report_datetime_fields_drop, 'date', 'excluded')
+para = add_list_fields_kept_or_dropped_to_pydoc(doc, stage_02_Objective_0_PreProcessing_004.dna_for_report_int_float_fields_drop, 'int', 'excluded')
+para = add_list_fields_kept_or_dropped_to_pydoc(doc, stage_02_Objective_0_PreProcessing_004.dna_for_report_str_fields_drop, 'str', 'excluded')
+para = add_list_fields_kept_or_dropped_to_pydoc(doc, stage_02_Objective_0_PreProcessing_004.dna_for_report_datetime_fields_drop, 'date', 'excluded')
 
 #sub-heading Carbon emissions section
 doc.add_heading('03. Carbon Emissions from Patient Travel', 3)
@@ -1557,15 +1557,15 @@ run = para.add_run("6. 'Attendance statuses reflective of an Attended appontment
 #list imputed fields
 doc.add_heading("Approach to handling missing data:", 5)
 doc.add_heading("Fields imputed (missing data replaced):", 5)
-para = add_list_fields_kept_or_dropped_to_pydoc(doc, stage_02_Objective_0_PreProcessing_003.emissions_for_report_int_float_fields_keep, 'int', 'included')
-para = add_list_fields_kept_or_dropped_to_pydoc(doc, stage_02_Objective_0_PreProcessing_003.emissions_for_report_str_fields_keep, 'str', 'included')
-para = add_list_fields_kept_or_dropped_to_pydoc(doc, stage_02_Objective_0_PreProcessing_003.emissions_for_report_datetime_fields_keep, 'date', 'included')
+para = add_list_fields_kept_or_dropped_to_pydoc(doc, stage_02_Objective_0_PreProcessing_004.emissions_for_report_int_float_fields_keep, 'int', 'included')
+para = add_list_fields_kept_or_dropped_to_pydoc(doc, stage_02_Objective_0_PreProcessing_004.emissions_for_report_str_fields_keep, 'str', 'included')
+para = add_list_fields_kept_or_dropped_to_pydoc(doc, stage_02_Objective_0_PreProcessing_004.emissions_for_report_datetime_fields_keep, 'date', 'included')
 
 #list dropped fields with missing data
 doc.add_heading("Fields with missing data that were removed from the analysis:", 4)
-para = add_list_fields_kept_or_dropped_to_pydoc(doc, stage_02_Objective_0_PreProcessing_003.emissions_for_report_int_float_fields_drop, 'int', 'excluded')
-para = add_list_fields_kept_or_dropped_to_pydoc(doc, stage_02_Objective_0_PreProcessing_003.emissions_for_report_str_fields_drop, 'str', 'excluded')
-para = add_list_fields_kept_or_dropped_to_pydoc(doc, stage_02_Objective_0_PreProcessing_003.emissions_for_report_datetime_fields_drop, 'date', 'excluded')
+para = add_list_fields_kept_or_dropped_to_pydoc(doc, stage_02_Objective_0_PreProcessing_004.emissions_for_report_int_float_fields_drop, 'int', 'excluded')
+para = add_list_fields_kept_or_dropped_to_pydoc(doc, stage_02_Objective_0_PreProcessing_004.emissions_for_report_str_fields_drop, 'str', 'excluded')
+para = add_list_fields_kept_or_dropped_to_pydoc(doc, stage_02_Objective_0_PreProcessing_004.emissions_for_report_datetime_fields_drop, 'date', 'excluded')
 
 
 '''
