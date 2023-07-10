@@ -603,8 +603,8 @@ def plot_learning_curve_with_sample_size_new(results_training_size, results_accu
     
     #round down the given sample size to the nearest 250
     rounded_sample_size = round_nearest_250(sample_size)
-    if rounded_sample_size not in range(250, max_training_size, 250):
-        result = range(250, max_training_size, 500)[-1]
+    if rounded_sample_size not in range(sample_size, max_training_size, sample_size):
+        result = range(sample_size, max_training_size, 500)[-1]
     else:
         result = rounded_sample_size
     

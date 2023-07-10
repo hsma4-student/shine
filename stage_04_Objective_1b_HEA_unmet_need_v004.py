@@ -1746,7 +1746,7 @@ for condition in list_of_conditions:
 
     #add the sorted series to the dictionary, as a value to the condition key
     dict_condition_ethnicity_sub_totals[condition] = convert_df_ethnicity_to_series
-
+    
 print(f"dict_condition_ethnicity_sub_totals: {dict_condition_ethnicity_sub_totals}")
 
 # -----------------------------------------------------
@@ -1773,6 +1773,9 @@ for condition in list_of_conditions:
 
     service_ethnicity_percents = calc_list_percents_for_list_ints(list(dict_service_counts_condition_ethnicity[condition]))
     dict_condition_ethnicity_service_percents[condition] = service_ethnicity_percents
+
+    print(f"{condition} - {service_ethnicity_percents}")
+    print(f"{condition} - {list(dict_condition_ethnicity_sub_totals[condition])}")
 
     #Then, convert population data to percents and add as a list of float values to the relevant dictionary above
     pop_ethnicity_percents = calc_list_percents_for_list_ints(list(dict_condition_ethnicity_sub_totals[condition]))
